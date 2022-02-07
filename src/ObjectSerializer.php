@@ -255,6 +255,8 @@ class ObjectSerializer
         } elseif ($class === 'object') {
             settype($data, 'array');
             return $data;
+        } elseif ($class === 'stdClass' && is_a($data, 'stdClass')) {
+            return $data;
         } elseif ($class === '\DateTime') {
             // Some API's return an invalid, empty string as a
             // date-time property. DateTime::__construct() will return
