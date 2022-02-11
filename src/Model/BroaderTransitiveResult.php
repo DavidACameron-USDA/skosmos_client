@@ -183,7 +183,7 @@ class BroaderTransitiveResult implements ModelInterface, ArrayAccess
     public function __construct(array $data = null)
     {
         $this->container['uri'] = isset($data['uri']) ? $data['uri'] : null;
-        $this->container['broader_transitive'] = isset($data['broader_transitive']) ? $data['broader_transitive'] : null;
+        $this->container['broader_transitive'] = isset($data['broader_transitive']) ? $data['broader_transitive'] : [];
     }
 
     /**

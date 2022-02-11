@@ -126,7 +126,7 @@ class Concept {
   public function getPrefLabel() {
     $label = '';
     try {
-      $label = $this->getValueForLang($this->concept->prefLabel);
+      $label = $this->getValueForLang($this->toArray($this->concept->prefLabel));
     }
     catch (\RuntimeException $e) {
       // Do nothing.
