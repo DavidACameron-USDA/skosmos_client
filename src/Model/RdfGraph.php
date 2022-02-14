@@ -18,7 +18,7 @@ use \SkosmosClient\Concept;
 use \SkosmosClient\ObjectSerializer;
 
 /**
- * IndexConcept Class Doc Comment
+ * RdfGraph Class Doc Comment
  *
  * @category Class
  * @package  SkosmosClient
