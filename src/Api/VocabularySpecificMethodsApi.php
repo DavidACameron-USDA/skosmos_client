@@ -99,11 +99,12 @@ class VocabularySpecificMethodsApi
      *
      * @throws \SkosmosClient\ApiException on non-2xx response
      * @throws \InvalidArgumentException
-     * @return void
+     * @return \SkosmosClient\Model\RdfGraph
      */
     public function vocidDataGet($vocid, $format = null, $uri = null, $lang = null)
     {
-        $this->vocidDataGetWithHttpInfo($vocid, $format, $uri, $lang);
+        list($response) = $this->vocidDataGetWithHttpInfo($vocid, $format, $uri, $lang);
+        return $response;
     }
 
     /**
@@ -118,11 +119,11 @@ class VocabularySpecificMethodsApi
      *
      * @throws \SkosmosClient\ApiException on non-2xx response
      * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \SkosmosClient\Model\RdfGraph, HTTP status code, HTTP response headers (array of strings)
      */
     public function vocidDataGetWithHttpInfo($vocid, $format = null, $uri = null, $lang = null)
     {
-        $returnType = '';
+        $returnType = '\SkosmosClient\Model\RdfGraph';
         $request = $this->vocidDataGetRequest($vocid, $format, $uri, $lang);
 
         try {
@@ -153,10 +154,39 @@ class VocabularySpecificMethodsApi
                 );
             }
 
-            return [null, $statusCode, $response->getHeaders()];
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            $rdfGraph = ObjectSerializer::deserialize($content, $returnType, []);
+            if (!empty($uri)) {
+                $rdfGraph->setUri($uri);
+            }
+            if (!empty($lang)) {
+                $rdfGraph->setLang($lang);
+            }
+            return [
+                $rdfGraph,
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
 
         } catch (ApiException $e) {
             switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\SkosmosClient\Model\RdfGraph',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
             }
             throw $e;
         }
